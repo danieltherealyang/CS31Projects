@@ -1,0 +1,53 @@
+Daniel Yang 
+ID: 205772799
+
+(Step 5)
+I input into original.cpp an integer that exceeded the INT_MAX value of the language. 
+INT_MAX was 2147483647 when I searched it up so when prompted I just entered an integer 1 more than that, so 2147483648 and the program ended up giving me incorrect values as the output. 
+I also tried exceeding the limit for INT_MIN and entered -2147483649 into the program, which is one more than the INT_MIN value of -2147483648 and also ended up with nonsensical output.
+
+	(Results)
+	INT_MAX overflow:
+When I ran the program, I first tried exceeding the INT_MAX and input 2147483648, which caused the program to completely skip the next two prompts for user input and gave me an output of:
+"-59.4% prefer being at school in person.
+0.0% prefer doing school from home.
+More students like doing school from home than being at school in person."
+
+I tried running the program again with the same input of 2147483648 but the program gave me a different result, outputting:
+"-61.3% prefer being at school in person.
+0.0% prefer doing school from home.
+More students like doing school from home than being at school in person."
+
+	INT_MIN overflow:
+I then tested the program by exceeding INT_MIN, inputting -2147483649 into the program and again it gave me a nonsensical result as well as skipping the next two prompts for user input, outputting:
+"-22.7% prefer being at school in person.
+-0.0% prefer doing school from home.
+More students like being at school in person than doing school at home."
+
+Just like INT_MAX, I again repeated this and ran the program again with the same input of -2147483649 and the program gave me a completely different result from the first time I ran it with an input exceeding INT_MIN, outputting:
+"50.6% prefer being at school in person.
+-0.0% prefer doing school from home.
+More students like doing school from home than being at school in person."
+
+Note: When I tried to do the same inputs using the g31 compiler, the percentages were different every time I ran the program but during each run the percentage preferring in person and at home were the same. I have no idea why the compiled versions behave differently though.
+
+(Step 6)
+	Error 1:
+For logic_error.cpp, I flipped the / and * operations for the double pctLikeInPerson and the double pctLikeAtHome calculations. So instead of the calculation being like 100.0 * likeInPerson / numberSurveyed I changed it to 100.0 / likeInPerson * numberSurveyed. This error causes the percentage calculation to always be greater than 100% with sensible input. 
+	Error 2:
+For the pctLikeAtHome variable declaration, I flipped the / and * operators and also removed the "." from 100.0 so that instead of the statement being "double pctLikeAtHome = 100.0 * likeAtHome / numberSurveyed" I made it "double pctLikeAtHome = 1000 / likeAtHome * numberSurveyed." This error causes the result of pctLikeAtHome to be an impossible percentage that exceeds normal limits.
+	Error 3:
+I also flipped the inequality for the if statement at the end of the program, changing it from "if (likeInPerson > likeAtHome)" to "if (likeInPerson < likeAtHome)." This error simply causes the if else statement to give an incorrect output, stating that more people like being in person if the likeInPerson variable is actually less than the likeAtHome variable. 
+	(Results)
+When I ran the program, I input 15,5,10 in that order and the program ended up producing:
+"300.0% prefer being at school in person.
+1500.0% prefer doing school from home.
+More students like being at school in person than doing school at home." as output. Since no variable limits were exceeded, the output for the program was wrong but consistent since running the same input multiple times gave the same output.
+
+(Step 7)
+	Error 1:
+For compile_error.cpp, I removed the space between the "double pctLikeInPerson" variable declaraction, so it changed to "doublepctLikeInPerson." When I ran the compiler, I got "error: ‘doublepctLikeInPerson’ was not declared in this scope" and "error: ‘pctLikeInPerson’ was not declared in this scope" as the error messages.
+	Error 2:
+I also flipped the extraction operator for cin to an insertion operator, changing the statement from "cin >> numberSurveyed" to cin << numberSurveyed. When I ran the compiler, I got the following error message of "error: no match for ‘operator<<’ (operand types are ‘std::istream’ {aka ‘std::basic_istream<char>’} and ‘int’)."
+	Error 3:
+I removed a semicolon from the line, "double pctLikeAtHome = 100.0 * likeAtHome / numberSurveyed;" which ended up becoming "double pctLikeAtHome = 100.0 * likeAtHome / numberSurveyed". When I ran the compiler, I got the message "error: expected ‘,’ or ‘;’ before ‘cout’."
