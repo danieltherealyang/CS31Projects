@@ -18,7 +18,7 @@ int main()
     cin >> likeAtHome;
 
     doublepctLikeInPerson = 100.0 * likeInPerson / numberSurveyed; //no space
-    double pctLikeAtHome = 100.0 * likeAtHome / numberSurveyed
+    double pctLikeAtHome = 100.0 * likeAtHome / numberSurveyed //no semicolon
 
     cout.setf(ios::fixed);
     cout.precision(1);

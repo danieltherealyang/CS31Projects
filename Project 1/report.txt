@@ -42,7 +42,7 @@ I also flipped the inequality for the if statement at the end of the program, ch
 When I ran the program, I input 15,5,10 in that order and the program ended up producing:
 "300.0% prefer being at school in person.
 1500.0% prefer doing school from home.
-More students like being at school in person than doing school at home." as output. Since no variable limits were exceeded, the output for the program was wrong but consistent since running the same input multiple times gave the same output.
+More students like being at school in person than doing school at home." as output. Since no variable limits were exceeded, the output for the program was wrong but consistent since running the same input multiple times gave the same output. I also tried some other reasonable inputs but each time, both percentage values were completely wrong and the final statement of "More students like being at..." was also wrong.
 
 (Step 7)
 	Error 1:
