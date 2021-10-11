@@ -1,0 +1,53 @@
+1. What is the output produced by the following program segment? Don't just run it — trace through it and figure it out by hand (which is a skill you'll need for the exams).
+string grendel = "endl";
+cout << "endl"; //endl
+cout << grendel; //endlendl
+cout << endl; //endlendl/n
+cout << "grendel"; //endlendl/n grendel
+
+Output:
+endlendl
+grendel
+
+2. The program prints a triangle made out of "#" characters with the number of "#" characters equal to the line number it prints on until the line number that is input by the user is reached. 
+
+3. 
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int side;
+
+    cout << "Enter a number: ";
+    cin >> side;
+
+    for (int i = 0; i < side; i++)
+    {
+	int j = i;
+	while (j >= 0) {
+	    cout << "#";
+	    j--;
+	}
+	cout << "\n";
+    }
+}
+
+4. 
+switch(codeSection) {
+    case 281:
+	cout << "bigamy";
+	break;
+    case 321:
+    case 322:
+	cout << "selling illegal lottery tickets";
+	break;
+    case 383:
+	cout << "selling rancid butter";
+	break;
+    case 598:
+	cout << "injuring a bird in a public cemetery";
+	break;
+    default:
+	cout << "some other crime";	
+}

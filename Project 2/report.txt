@@ -1,0 +1,34 @@
+Daniel Yang
+ID: 205772799
+
+(Obstacles)
+Some of the obstacles that I overcame was an issue with calculation during the debugging process.
+To check if the winter rates should be used, I used a variable with the bool data type.
+The bool variable assignment ended up becoming "bool isWinter = (month < 4) || (month == 12);"
+However, initially, instead of using the equality operator "==" I used the assignment operator "=".
+
+When I was testing my program, they always ended up returning the wrong amount so to find the problem,
+I had the program print out variables as they were assigned to let me see what was happening as it was running.
+
+I started with test cases that gave correct outputs and gradually began testing one by one which parameters resulted
+in incorrect outputs. This process led me to discovering that I mistakenly used the wrong operator for the bool variable.
+Through this process, I also found that I was using an int to tabulate the total amount instead of a double which I then fixed.
+
+(Test Cases)
+Negative Odometer Reading (-130, 150, 5, asdf, n, 12)
+Ending Odometer Less Than Starting (500, 10, 5, asdf, n, 5)
+Number of Rental Days Must be Positive (1, 5, -13, asdf, n, 12)
+Empty String for Customer Name (10, 100, 5, "", y, 7)
+Luxury Status is not y or n (10, 20, 1, asdf, r, 7)
+Month Number is negative (10, 20, 1, asdf, y, -1)
+Month Number is greater than 12 (10, 20, 1, asdf, n, 13)
+Miles Driven is less than 100 (0, 90, 5, asdf, y, 5)
+Miles Driven is 100 (0, 100, 4, asdf, y, 4)
+Miles Driven is Between 100 and 500 (0, 490, 3, asdf, n, 12)
+Miles Driven is 500 (0, 500, 5, asdf, y, 5)
+Miles Driven is greater than 500 (0, 580, 7, asdf, n, 4)
+Earliest Erroneous Message (-10, 20, -5, "", Y, 13)
+Earliest Erroneous Message (10, 0, -5, "", Y, 13)
+Earliest Erroneous Message (0, 10, -5, "", Y, 13)
+Earliest Erroneous Message (0, 10, 5, "", Y, 13)
+Earliest Erroneous Message (0, 10, 5, asdf, Y, 13)
