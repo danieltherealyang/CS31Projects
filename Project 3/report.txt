@@ -1,0 +1,158 @@
+Daniel Yang
+ID: 205772799
+
+(Obstacles)
+One of the obstacles that I had to overcome was coming up with a proper loop that would terminate at appropriate times.
+For example, the while loops in the obeyPlan and determineSafeDistance required me to test a lot of inputs
+to ensure that the conditions for continuing iterating through the loop were proper.
+In addition, another obstacle I faced was determining the correct order of actions in each function after terminating loops.
+For example, in the determineSafeDistance function I was having trouble figuring out why the output was always
+one greater than the correct value but then I realized that I didn't subtract 1 from my step counter to account
+for the terminating loop iteration. Another example of this is in the obeyPlan function where I couldn't figure
+out why nSteps wasn't updating when the function returned 1 but was updating when the function returned 0.
+I eventually looked at the if statement after the big while loop in the function and figured out that I was
+only reassigning the value of nSteps when the final coordinates after following the plan was equal to the er
+and ec parameters.
+
+(Design of Program)
+hasCorrectForm:
+For this function, I used an int variable to count the number of digits and used a for loop to iterate through
+all the characters of the plan string. For each iteration, I checked whether the character was a digit or an alphanumeric.
+In the case that the character was a digit, I added 1 to the digit counter and immediately continued to the next iteration.
+In the case that the character was alphabetic, I checked if the character was 'l' or 'r' (case insensitive) and 
+reset the digit counter to 0 if it was and returned false if not. Another condition that was checked during each
+iteration of the for loop was whether the digit counter.
+    
+    (Pseudocode)
+repeatedly:
+    if digit counter greater than 2,
+    return false
+    if character digit,
+        add 1 to digit counter
+        continue
+    if character is not  uppercase or lowercase "l" or "r",
+        return false
+    if string doesn't end on "l" or "r",
+        return false
+return true
+
+determineSafeDistance:
+For this function, I first checked if the coordinates given were valid empty grid positions, then
+checked if the dir was a valid direction letter and finally checked if maxSteps was negative and
+if any of those conditions were not met, then the function would return -1. To actually find the
+safe distance, I wrote a separate function that would set the row and column increments for movement
+in the direction given. After calling that function to set the increments, I then used a while loop
+to continue incrementing the row and column coordinates in the direction specified until the
+coordinates were either on a position with a wall or went off the grid, adding 1 to a counter variable
+for each iteration of the loop. After completing the loop, I then subtracted 1 from the counter variable
+to account for the failed final iteration of the while loop and returned the value of the counter as the
+maximum number of safe steps in a given direction.
+
+    (Pseudocode)
+if coordinates out of bounds or direction invalid or maxSteps is negative,
+    return -1
+
+set row and column increments
+repeatedly:
+    if current position is wall or out of bounds,
+        break
+    add 1 to counter
+subtract 1 from counter
+return counter
+
+obeyPlan:
+For this function, I first checked if the start and end positions, the dir character, and the plan string is valid with
+the hasCorrectForm function and returned 2 if any one of them is not. After that, my function obeys the plan one plan
+portion at a time and checks if the final position matches the final position coordinates input in the function as parameters
+and returns 0 if they match and 1 if they don't and sets nsteps to the number of steps in the plan. For each plan portion
+this function calls the determineSafeDistance function and checks if it is possible to travel the specified number of
+steps in the plan portion. If at any point while the function obeys the plan it finds a wall or goes off the grid,
+nsteps is set to the maximum number of safe steps taken while following the plan and the function returns a value of 3.
+
+    (Pseudocode)
+if start and end positions invalid,
+    return 2
+if dir invalid,
+    return 2
+if plan invalid,
+    return 2
+
+repeatedly:
+    parse plan portion
+    if can obey plan portion,
+        update step counter
+        change direction
+    else
+        update step counter to max safe steps
+        set nsteps to step counter
+        return 3
+
+set nsteps to step counter
+if final coordinates equal end coordinate input parameters,
+    return 0
+else
+    return 1
+
+(Test Cases)
+assert(hasCorrectForm("5rL00L0R09R7L")); //correct plan
+assert(hasCorrectForm("42l")); //accept lowercase letters
+assert(!hasCorrectForm("1Rx2L")); //reject foreign characters
+assert(!hasCorrectForm("144R")); //reject more than 2 digits
+assert(!hasCorrectForm("1R+2L. N144")); //reject foreign characters
+assert(hasCorrectForm("")); //accept empty string
+assert(!hasCorrectForm("1 L")); //reject space
+assert(!hasCorrectForm("1L,2R")); //reject commas
+assert(determineSafeDistance(0,0,'n',5) == -1); //tests for r,c out of bounds
+assert(determineSafeDistance(0,2,'s',10) == -1); //tests for r,c out of bounds
+assert(determineSafeDistance(10,0,'e',5) == -1); //tests for r,c out of bounds
+assert(determineSafeDistance(10,0,'e',1) == -1); //tests for r,c out of bounds
+assert(determineSafeDistance(11,1,'n',5) == -1); //tests for r,c out of bounds
+assert(determineSafeDistance(2,2,'N',5) == -1); //tests for r,c is a wall
+assert(determineSafeDistance(3,2,'N',5) == -1); //tests for r,c is a wall
+assert(determineSafeDistance(1,4,'N',5) == -1); //tests for r,c is a wall
+assert(determineSafeDistance(8,10,'N',5) == -1); //tests for r,c is a wall
+assert(determineSafeDistance(1,2,'x',5) == -1); //incorrect dir parameter
+assert(determineSafeDistance(1,2,'=',5) == -1); //incorrect dir parameter
+assert(determineSafeDistance(1,2,'\0',5) == -1); //null char as dir
+assert(determineSafeDistance(1,2,'\n',5) == -1); //newline as dir
+assert(determineSafeDistance(1,2,'y',5) == -1); //incorrect dir parameter
+assert(determineSafeDistance(1,2,'N',-1) == -1); //negative maxSteps param
+assert(determineSafeDistance(1,2,'N',-5) == -1); //negative maxSteps
+assert(determineSafeDistance(2,2,'\0',-1) == -1); //multiple incorrect parameters
+assert(determineSafeDistance(1,2,'N',0) == 0); //maxSteps is 0
+assert(determineSafeDistance(1,2,'n',0) == 0); //lowercase dir parameter
+assert(determineSafeDistance(1,1,'E',5) == 2); //tests for correct function output
+assert(determineSafeDistance(1,2,'S',5) == 0); //tests for correct function output
+assert(determineSafeDistance(1,1,'S',10) == 9); //tests for correct function output
+assert(determineSafeDistance(1,1,'S',8) == 8); //tests for correct function output
+assert(determineSafeDistance(1,1,'s',9) == 9); //lowercase dir
+assert(determineSafeDistance(8,1,'e',9) == 8); //lowercase dir
+assert(determineSafeDistance(8,1,'w',10) == 0); //lowercase dir
+assert(determineSafeDistance(8,9,'e',15) == 0); //lowercase dir
+assert(determineSafeDistance(5,6,'S',15) == 5); //maxSteps greater than safe distance
+assert(determineSafeDistance(5,6,'S',20) == 5); //maxSteps greater than safe distance
+assert(determineSafeDistance(5,6,'e',4) == 4); //safe distance greater than max steps
+assert(determineSafeDistance(5,6,'W',5) == 5); //safe distance equal to max steps
+assert(determineSafeDistance(5,6,'w',5) == 5); //lowercase dir
+assert(obeyPlan(1,1,1,1,'n',"rrlrlllLLLLLR",nSteps) == 0 && nSteps == 0); //no steps taken
+assert(obeyPlan(1,1,2,1,'S',"LRLRLRLRlllllllrrrrr",nSteps) == 1 && nSteps == 0); //incorrect end coords after obeying plan
+assert(obeyPlan(2,2,2,1,'S',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //starting position is a wall
+assert(obeyPlan(1,1,2,2,'S',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //ending position is a wall
+assert(obeyPlan(0,1,2,1,'S',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //starting position out of bounds
+assert(obeyPlan(1,20,2,1,'S',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //starting position out of bounds
+assert(obeyPlan(1,1,2,0,'S',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //ending position out of bounds
+assert(obeyPlan(1,1,11,50,'S',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //ending position out of bounds
+assert(obeyPlan(1,1,2,1,'v',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //invalid dir
+assert(obeyPlan(1,1,2,1,'x',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //invalid dir
+assert(obeyPlan(1,1,2,1,'\0',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //invalid dir
+assert(obeyPlan(1,1,2,1,'\n',"LRLRLRLRlllllllrrrrr",nSteps) == 2 && nSteps == 15); //invalid dir
+assert(obeyPlan(1,1,2,1,'S',"asdfdsasdfdasdfa",nSteps) == 2 && nSteps == 15); //invalid plan
+assert(obeyPlan(1,1,2,1,'W',"xxxxxx",nSteps) == 2 && nSteps == 15); //invalid plan
+assert(obeyPlan(1,1,2,1,'s',"----====v=al   lll2",nSteps) == 2 && nSteps == 15); //invalid plan
+assert(obeyPlan(1,1,2,1,'e',"",nSteps) == 1 && nSteps == 0); //plan is empty string
+assert(obeyPlan(1,1,1,1,'n',"",nSteps) == 0 && nSteps == 0); //plan is empty string
+assert(obeyPlan(9,11,9,10,'E',"5L",nSteps) == 3 && nSteps == 4); //wall or grid border on path
+assert(obeyPlan(9,15,1,1,'e',"3L",nSteps) == 3 && nSteps == 0); //wall or grid border on path
+assert(determineSafeDistance(1,1,'n',5) == 0); //test if functions work on 1x1 grid
+assert(obeyPlan(1,1,2,1,'n',"",nSteps) == 2 && nSteps == 5); //empty path on 1x1 grid
+assert(obeyPlan(1,1,1,1,'n',"1L",nSteps) == 3 && nSteps == 0); //can't obey plan
