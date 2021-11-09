@@ -134,7 +134,7 @@ int obeyPlan(int sr, int sc, int er, int ec, char dir, string plan, int& nsteps)
     int stepCount = 0; //counter of possible steps in plan
 
     //check if start and end coords are in bounds
-    if (sr < 1 || sc < 1 || sr > rows || sc > cols || er < 1 || ec < 1 || er > rows || er > cols)
+    if (sr < 1 || sc < 1 || sr > rows || sc > cols || er < 1 || ec < 1 || er > rows || ec > cols)
         return 2;
     //check if start and end coords are walls
     if (isWall(sr, sc) || isWall(er, ec))
@@ -195,7 +195,21 @@ int obeyPlan(int sr, int sc, int er, int ec, char dir, string plan, int& nsteps)
     }
 }
 
+void makemaze()
+{
+//   12345678901234
+// 1 ..............
+// 2 ......*.......
+// 3 ..............
+// 4 ..*...........
+// 5 ......*.......
+
+        setSize(5,14);
+        setWall(4,3);
+        setWall(2,7);
+        setWall(5,7);
+}
+
 int main()
 {
-    
 }

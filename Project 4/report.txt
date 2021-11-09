@@ -1,0 +1,101 @@
+Daniel Yang
+ID: 205772799
+
+(Obstacles)
+An obstacle that I overcame for this project was determining the action that 
+functions take for edge cases. For many of the functions, I had to make sure
+the loops didn't attempt to read data for an array item that was out of bounds.
+Some of the loops in the functions used variable counters to offset the loop
+counter for the index of the array so I had to test many different values
+to ensure that none of those loops had an out of bounds error. In addition, I
+also had to consider what the functions would do in case of n aray size of 0. For
+some of the functions, the action was specified but for others I had to consider
+whether to consider it as a bad input and return -1 or not. Since many of the
+functions return a position of an element in the array so in that particular
+context if there is an array of size 0 returning a position of 0 doesn't make
+sense so I chose to have an array size input of 0 return -1. However, this is
+inconsistent since for example in the subsequence() function it stated that an
+empty array should be considered a subsequence of any array starting at position 0.
+Because of this discrepency, I had to carefully consider the case of this input
+for every function.
+
+(Test Data)
+string redupArray[6] = { "mahi", "bon", "cous", "", "tar", "mur" };
+assert(reduplicate(redupArray, 6) == 6); //reduplicate returns n
+assert(reduplicate(redupArray, -1) == -1); //reduplicate returns -1 for neg array size
+assert(reduplicate(redupArray, 0) == 0); //0 doesn't throw error
+string testArray[5] = { "asdf", "fdas", "ELsa", "eLsA", "123"};
+assert(locate(testArray, 5, "eLsA") == 3); //proper return value
+assert(locate(testArray, 0, "ELsa") == -1); //0 as array size
+assert(locate(testArray, -5, "asdf") == -1); //negative array size
+assert(locate(testArray, 2, "fdas") == 1); //proper return value
+string people[5] = { "merida", "tiana", "raya", "ariel", "moana" };
+assert(locate(people, 3, "moana") == -1); //-1 if failed to find string
+assert(locationOfMax(testArray, 5) == 1); //proper return value
+assert(locationOfMax(testArray, 2) == 1); //proper return value
+assert(locationOfMax(testArray, 0) == -1); //0 as array size
+assert(locationOfMax(testArray, -1) == -1); //negative array size
+assert(locationOfMax(testArray, 3) == 1); //proper return value
+string folks[5] = { "moana", "elsa", "ariel", "raya", "mulan" };
+int m = circleLeft(folks, 5, 1);
+assert(m == 1); //proper return value
+assert(folks[4] == "elsa"); //test for change in array order
+assert(folks[1] == "ariel"); //test for change in array order
+string folks2[5] = { "moana", "elsa", "ariel", "raya", "mulan" };
+int n = circleLeft(folks2, 3, 0); //test 0 as position
+assert(n == 0); //proper return value
+assert(folks2[2] == "moana"); //proper array order 
+assert(folks2[0] == "elsa"); //proper array order
+assert(folks2[1] == "ariel"); //proper array order
+assert(circleLeft(folks2, -5, 0) == -1); //negative array size
+assert(circleLeft(folks2, 3, 5) == -1); //position greater than array size
+assert(circleLeft(folks2, 0, 0) == -1); //test 0 as array size
+assert(circleLeft(folks2, 4, -2) == -1); //negative position
+n = circleLeft(folks2, 1, 0);
+assert(folks2[0] == "elsa"); //test 1 as array size
+string d[9] = {
+"belle", "merida", "raya", "raya", "tiana", "tiana", "tiana", "raya", "raya" };
+assert(enumerateRuns(d, 9) == 5); //proper return value
+assert(enumerateRuns(d, 0) == -1); //no elements in array
+assert(enumerateRuns(d, 1) == 1); //test 1 as array size
+assert(enumerateRuns(d, -1) == -1); //negative array size
+assert(enumerateRuns(d, -2) == -1); //negative array size
+assert(enumerateRuns(d, 3) == 3); //proper return value
+assert(enumerateRuns(d, 4) == 3); //proper return value
+string roles[6] = { "merida", "raya", "", "belle", "moana", "elsa" };
+int q = flip(roles, 4);
+assert(q == 4); //proper return value
+assert(roles[0] == "belle"); //proper array order
+assert(roles[3] == "merida"); //proper array order
+assert(roles[4] == "moana"); //proper array order
+assert(roles[5] == "elsa"); //elements outside range unaffected
+string roles1[6] = { "merida", "raya", "", "belle", "moana", "elsa" };
+string group[5] = { "merida", "raya", "elsa", "", "belle" };
+assert(locateDifference(roles1, 6, group, 5) == 2); //proper return value
+assert(locateDifference(roles1, 2, group, 1) == 1); //proper return value
+assert(locateDifference(roles1, 0, group, 4) == -1); //test 0 as array size
+assert(locateDifference(group, 3, roles1, 2) == 2); //proper return value
+assert(locateDifference(group, -3, roles1, 3) == -1); //negative array size
+string names[10] = { "moana", "mulan", "raya", "tiana", "merida" };
+string names1[10] = { "mulan", "raya", "tiana" };
+assert(subsequence(names, 5, names1, 3) == 1); //proper return value
+string names2[10] = { "moana", "tiana" };
+assert(subsequence(names, 4, names2, 2) == -1); //proper return value
+assert(subsequence(names, 0, names2, 1) == -1); //n2 greater than n1
+assert(subsequence(names1, 3, names2, 0) == 0); //subsequence of size 0;
+string locateAnyNames[10] = { "moana", "mulan", "raya", "tiana", "merida" };
+string set1[10] = { "elsa", "merida", "tiana", "mulan" };
+assert(locateAny(locateAnyNames, 6, set1, 4) == 1); //proper return value
+string set2[10] = { "belle", "ariel" };
+assert(locateAny(locateAnyNames, 4, set2, 2) == -1); //fail to find equal element
+assert(locateAny(locateAnyNames, 6, set2, 0) == -1); //0 as n2 array size
+assert(locateAny(locateAnyNames, 0, set2, 2) == -1); //0 as n1 array size
+assert(locateAny(locateAnyNames, -1, set1, 4) == -1); //negative n1 array size
+assert(locateAny(locateAnyNames, 6, set1, -2) == -1); //negative n2 array size
+string cast[6] = { "elsa", "ariel", "mulan", "belle", "tiana", "moana" };
+assert(separate(cast, 6, "merida") == 3); //proper return value
+string cast2[4] = { "raya", "mulan", "ariel", "tiana" };
+assert(separate(cast2, 4, "raya") == 2); //proper return value
+assert(separate(cast2, 0, "raya") == 0); //0 as array size
+assert(separate(cast2, 4, "zzzzz") == 4); //no elements > separator
+assert(separate(cast2, 4, "aaa") == 0); //all elements > separator
