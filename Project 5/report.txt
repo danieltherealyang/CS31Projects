@@ -1,0 +1,40 @@
+Daniel Yang
+ID: 205772799
+(Obstacles)
+Some obstacles that I overcame was trying to figure out how to structure and segment my program.
+I was confused at first because I didn't know where to start with the problem however I began
+breaking down the program into various sections such as sanitizing crib input or checking length
+pattern matches with the crib. As I thought about the compartmentalized tasks that needed to be
+accomplished to decrypt the ciphertext, writing the program became easier. Another obstacle that
+I had to overcome was debugging. Since I had to write a lot of loops and had to keep track of many
+iterating variables in many of the functions, problems such as out of bounds errors and incorrect
+values being written to arrays occurred and a lot of the time the problem wasn't readily apparent
+which required me to debug each function one by one to isolate the problems.
+
+(Design)
+
+
+(Test Data)
+assert(decrypt("Xbg'j rsj jds jsrrsy jycn jds ucrsgj qrqyt.\nZU 31 cu zdqrrsgecge!", "silent alarm")); //check multiline ciphertext
+assert(decrypt("Xbg'j rsj jds jsrrsy jycn jds ucrsgj qrqyt.\nZU 31 cu zdqrrsgecge!\n", "silent alarm")); //ciphertext ends with newline
+assert(decrypt("F lgr rntoy rkwndyk ahna'y\n phklk ahk mgtks fyadys", "secret")); //match at end of ciphertext
+assert(decrypt("F lgr rntoy rkwndyk ahna'y fyadys\n phklk ahk mgtks fyadys.", "secret")); //match at end of line
+assert(!decrypt("Rzy pkr", "123431")); //no words in crib
+assert(!decrypt("Rzy pkr", "")); //empty crib
+assert(!decrypt("Rzy pkr", "    \n\n")); //empty crib
+assert(decrypt("Rzy pkr", "dog")); //multiple matches in a message
+assert(decrypt("cdc ef", "aba")); //crib matches entire ciphertext word
+assert(!decrypt("cdcef", "aba")); //crib doesn't match if not entire ciphertext word
+assert(!decrypt("efcdc", "aba")); //crib doesn't match if not entire ciphertext word
+assert(!decrypt("bwra wmwt\nqeirtk spst\n", "alan turing")); //crib doesn't span multiple messages
+assert(!decrypt("ew'q p-aj", "dog")); //word is only a sequence of letters
+assert(decrypt("ew'q p-aj", "he")); //nonalpha char treated as blanks
+assert(decrypt("Kpio't dmpbl-boe-ebhhfs opwfm", "s cloak and")); //nonalpha char treated as blanks
+assert(decrypt("F gspt fe! zyxZYXzyx--Abca abCa    bdefg## $$dsptrqtj6437 wvuWVUwvu\n\n8 9\n", "hush-hush until November 25, 2021")); //crib ignores numbers
+assert(decrypt("F gspt fe! zyxZYXzyx--Abca abCa    bdefg## $$dsptrqtj6437 wvuWVUwvu\n\n8 9\n", "   hush???hUSh---     --- until    NovemBER !!  ")); //crib ignores blanks and case
+assert(decrypt("F gspt fe! zyxZYXzyx--Abca abCa    bdefg## $$dsptrqtj6437 wvuWVUwvu\n\n8 9\n", "hush hush until november")); //proper crib sanitization
+assert(!decrypt("", "a")); //empty ciphertext
+assert(!decrypt("1232341$@##4%!$  \n 1232132\n\n ", "a")); //no words in ciphertext
+assert(decrypt("\n\n     ew'q p-aj", "he")); //empty messages in ciphertext at beginning lines
+assert(decrypt("ew'q\n\n 123213'''''  \n p-aj", "he")); //message with no words in ciphertext
+assert(decrypt("ew'q\n\n 123213'''''  \n p-aj\n\n\n '12321", "he")); //last message in ciphertext no words
