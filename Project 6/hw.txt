@@ -1,0 +1,223 @@
+Daniel Yang
+ID: 205772799
+
+(Problem 1)
+a.
+int main()
+{
+    int arr[3] = { 5, 10, 15 };
+    int* ptr = arr;
+
+    *(ptr++) = 30;          // set arr[0] to 30
+    *(ptr++) = 20;      // set arr[1] to 20
+    *(ptr++) = 10;        // set arr[2] to 10
+    ptr = &arr[0];
+
+    while (ptr < arr+3)
+    {
+        cout << *ptr << endl;    // print values
+	    ptr++;
+    }
+}
+b. The function won't work because the findMax function is accepting a copy of the pointer as a
+parameter rather than a reference to the pointer. To fix the function, add a "&" to the variable
+of the last function parameter to change the parameter to a reference.
+
+void findMax(int arr[], int n, int*& pToMax) //changed to fix
+{
+    if (n <= 0) 
+        return;      // no items, no maximum!
+
+    pToMax = arr;
+
+    for (int i = 1; i < n; i++)
+    {
+        if (arr[i] > *pToMax)
+                pToMax = arr + i;
+    }
+}       
+
+int main()
+{
+    int nums[4] = { 5, 3, 15, 6 };
+    int* ptr = &nums[0];
+
+    findMax(nums, 4, ptr);
+    cout << "The maximum is at address " << ptr << endl;
+    cout << "It's at position " << ptr - nums << endl;
+    cout << "Its value is " << *ptr << endl;
+}
+c. The main function has a problem because ptr is uninitialized which causes the program to have
+unexpected behavior. A way to fix this is to declare a variable and set ptr as a reference to the
+variable to initialize the pointer.
+
+void computeCube(int n, int* ncubed)
+{
+    *ncubed = n * n * n;
+}
+
+int main()
+{
+    int num = 5; //declared num variable
+    int* ptr = &num; //set ptr as reference
+    computeCube(num, ptr);
+    cout << "Five cubed is " << *ptr << endl;
+}
+d. A problem with the implementation of the function is that the variables used to compare the array
+elements don't actually compare the values of the elements themselves but compare the memory addresses.
+A way to fix this is to put the * operator before variables where the values of the elements of the
+array need to be compared in order to dereference the pointer and retrieve the value.
+
+bool strequal(const char str1[], const char str2[])
+{
+    while (*str1 != '\0'  &&  *str2 != '\0')  // zero bytes at ends
+    {
+        if (*str1 != *str2)  // compare corresponding characters
+            return false;
+        str1++;            // advance to the next character
+        str2++;
+    }
+    return *str1 == *str2;   // both ended at same time?
+}
+
+int main()
+{
+    char a[15] = "Wang, A.";
+    char b[15] = "Wang, R.";
+
+    if (strequal(a,b))
+        cout << "They're the same person!\n";
+}
+e. The program is returning a pointer to a local array inside getPtrToArray and assigning it to ptr
+variable inside the main function. Since local variables are stored on the stack and deleted after
+the function returns a value, the ptr variable in the main function is assigned a memory address
+pointing to a block of memory in the stack whose contents may have been deleted or overwritten already,
+leading to undefined behavior. Instead, the getPtrToArray should have accepted anArray as a parameter
+rather than initializing it inside the function and the main function should declare an array of size
+100 and pass it to getPtrToArray.
+
+(Problem 2)
+a. double* cat;
+b. double mouse[5];
+c. cat = &mouse[4];
+d. *cat = 25;
+e. *(mouse + 3) = 54;
+f. cat -= 3;
+g. cat[1] = 17;
+h. cat[0] = 42;
+i. bool d = (cat == &mouse[0]);
+j. bool b = (*cat == *(cat++));
+
+(Problem 3)
+a. 
+double mean(const double* scores, int numScores)
+{
+    const double* ptr = scores;
+    double tot = 0;
+    int offset = 0;
+    while (ptr != scores + numScores)
+    {
+        tot += *(ptr+offset);
+        offset++;
+    }
+    return tot/numScores;
+}
+b.
+const char* findTheChar(const char* str, char chr)
+{
+    for (int k = 0; *(str+k) != 0; k++)
+        if (*(str+k) == chr)
+            return (str+k);
+
+    return nullptr;
+}
+c.
+const char* findTheChar(char* str, char chr)
+{
+    while (*str != 0) {
+        if (*str == chr)
+            return str;
+        str++;
+    }
+
+    return nullptr;
+}
+
+(Problem 4)
+#include <iostream>
+using namespace std;
+
+int* maxwell(int* a, int* b) //return the pointer with the greater value
+{
+    if (*a > *b) //if the value that a points to is greater than the value b points to the return a else return b
+        return a;
+    else
+        return b;
+}
+
+void swap1(int* a, int* b) //swap pointer addresses
+{
+    int* temp = a; //declare temp pointer and assign it the value A
+    a = b; //assign b to a
+    b = temp; //assign b the value the initial value of b
+}
+
+void swap2(int* a, int* b) //swap pointer values
+{
+    int temp = *a; //declare int with the value that a points to
+    *a = *b; //assign the value that a points to the value that b points to
+    *b = temp; //assign the value that b points to the value of temp
+}
+
+int main()
+{
+    int array[6] = { 5, 3, 4, 17, 22, 19 }; //initialize array
+
+    int* ptr = maxwell(array, &array[2]); //set ptr to array[0] address
+    *ptr = -1; //array[0] is assigned a value of -1; array: { -1, 3, 4, 17, 22, 19 }
+    ptr += 2; //pointer points to array[2]
+    ptr[1] = 9; //array[3] is assigned a value of 9; array: { -1, 3, 4, 9, 22, 19 }
+    *(array+1) = 79; //array[1] is assigned a value of 79; array: { -1, 79, 4, 9, 22, 19 }
+
+    cout << &array[5] - ptr << endl; //output 3 because ptr currently holds the address of array[3]
+
+    swap1(&array[0], &array[1]); //generates pointer addresses, swaps, changes nothing -> array still in same order; array: { -1, 79, 4, 9, 22, 19 }
+    swap2(array, &array[2]); //swap values of array[0] and array[2]; array: { 4, 79, -1, 9, 22, 19 }
+
+    for (int i = 0; i < 6; i++)
+        cout << array[i] << endl; //output each element of array on a newline
+} 
+
+Output:
+3
+4
+79
+-1
+9
+22
+19
+
+The program outputs this because for the first line maxwell returns the address of array because the
+value that array points to is greater than the value that array[2] points to. ptr is then dereferenced
+and assigned a value of -1, replacing array[0] with -1. ptr is then incremented by 2, now pointing at
+array[2]. ptr[1] is assigned a value of 9, meaning that array[3] is overwritten with a value of 9.
+The value at array+1 is assigned a value of 79, meaning that array[1] stores a value of 79. At this
+point of the program ptr points to array[2]. The program outputs 3 because subtracting the address of
+array[2] from the address of array[5] returns 3 because there is a gap of 3 ints between the memory
+addresses. The swap1 function call does nothing because it swaps its local copies of the addresses
+passed to it and doesn't change anything outside of the scope of the function call. The swap2 function
+call swaps the values of array[0] and array[2], leaving the final state of the array as { 4, 79, -1, 9, 22, 19 }.
+The program then outputs the elements of the array one by one on each line starting from the lowest index.
+
+(Problem 5)
+void removeS(char* ptr) {
+    char* offsetPtr = ptr;
+    while (*offsetPtr != '\0') {
+        while (*offsetPtr == 's' || *offsetPtr == 'S')
+            offsetPtr++;
+        *ptr = *offsetPtr;
+        ptr++;
+        offsetPtr++;
+    }
+    *ptr = '\0';
+}

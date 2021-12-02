@@ -8,76 +8,58 @@ struct keymap {
     char cipher = '\0';
     char plain = '\0';
 };
-//function to remove nonalpha characters and replace them with blanks, removes starting and trailing whitespace
-bool sanitizeCrib(char crib[]) {
-    //set initial variables
-    int offset = 0;
-    int blankCount = 0;
-    int i = 0;
-    //loop through each char in crib until terminating char
-    for (i = 0; crib[i + offset] != '\0'; i++) {
-        //case if i+offset char is not alpha
-        if (!isalpha(crib[i + offset])) {
-            //skip starting blanks
-            if (i == 0) {
-                i--;
-                offset++;
-                continue;
-            }
-            //increment blankCount b/c not alpha char
-            blankCount++;
-            //skip past multiple blanks
-            if (blankCount > 1) {
-                i--;
-                offset++;
-                continue;
-            }
-            //write that char as blank
-            crib[i] = ' ';
-        } else {
-            //if i+offset is alpha char reset blankCount
-            if (blankCount != 0)
-                blankCount = 0;
-            //write char to sanitized crib
-            crib[i] = toupper(crib[i + offset]);
-        }
-    }
-    if (i > 91)
-        return false;
-    //terminate the sanitized crib string, max blankCount is 1 so make sure sanitized crib doesn't end with blank
-    if (blankCount == 0)
-        crib[i] = '\0';
-    else
-        crib[i-1] = '\0';
-    return true;
-}
 //function finds if a string matches crib and sets index param as the start index of match
 //assumes that crib is nothing but letters and single spaces between words
 //match inclusive of start and end indexes
 bool findLengthMatch(const char cipher[], int start, int end, const char crib[], int& index) {
+    //skip past starting blanks
+    int cribStart = 0;
+    while (!isalpha(crib[cribStart])) {
+        cribStart++;
+    }
+    //ignore ending blanks
+    int cribEnd = 0;
+    for (int i = 0; crib[i] != '\0'; i++) {
+        if (isalpha(crib[i]))
+            cribEnd = i;
+    }
     //index for crib
-    int i = 0;
+    int i = cribStart;    
     //index for cipher
     int j = start;
     //index of match start
     int matchStart;
+    //count for blanks
+    int blankCount = 0;
     //in case crib matches very first char of cipher
     if (isalpha(crib[i]) && isalpha(cipher[j]))
         matchStart = j;
-    while (crib[i] != '\0' && cipher[j] != '\0' && j <= end) {
+    while (crib[i] != '\0' && i <= cribEnd && cipher[j] != '\0' && j <= end) {
+        if (!isalpha(crib[i])) {
+            //skip past multiple blanks
+            if (blankCount > 0) {
+                i++;
+                continue;
+            }
+        } else if (blankCount > 1) {
+            i--;
+        }
         //increment both if match reset crib index if not a match
         //if cipher is blank then increment until next alpha
         if (isalpha(crib[i]) && isalpha(cipher[j])) {
+            blankCount = 0;
             i++;
             j++;
         } else if (!isalpha(crib[i]) && !isalpha(cipher[j])) {
             i++;
+            blankCount++;
             //skips blanks in cipher until next alpha char
             while (!isalpha(cipher[j])) {
                 j++;
             }
         } else if (isalpha(crib[i]) && !isalpha(cipher[j])) {
-            i = 0;
+            i = cribStart;
+            blankCount = 0;
             //skips blanks in cipher until next alpha char
             while (!isalpha(cipher[j])) {
                 j++;
@@ -85,8 +67,9 @@ bool findLengthMatch(const char cipher[], int start, int end, const char crib[],
             //reset matchStart
             matchStart = j;
         } 
-        if (!isalpha(crib[i]) && isalpha(cipher[j])) {
-            i = 0;
+        //check if crib ends before cipher word ends
+        if (!isalpha(crib[i]) && isalpha(cipher[j]) && blankCount == 0) {
+            i = cribStart;
             //move cipher index to end of word
             while (isalpha(cipher[j])) {
                 j++;
@@ -96,7 +79,7 @@ bool findLengthMatch(const char cipher[], int start, int end, const char crib[],
         }
     }
     //crib has to be on null char, make sure index of cipher is the end of the word, sets index to the start of match
-    if (crib[i] == '\0' && !isalpha(cipher[j])) {
+    if (i > cribEnd && !isalpha(cipher[j])) {
         index = matchStart;
         return true;
     } else {
@@ -104,16 +87,21 @@ bool findLengthMatch(const char cipher[], int start, int end, const char crib[],
     }
 }
 //function checks if pattern matches
-bool findPatternMatch(const char cipher[], int startIndex, const char crib[], keymap keyMap[]) {
+bool findPatternMatch(const char cipher[], int start, int end, const char crib[], keymap keyMap[]) {
+    int cribEnd = 0;
+    for (int i = 0; crib[i] != '\0'; i++) {
+        if (isalpha(crib[i]))
+            cribEnd = i;
+    }
     //index of cipher
-    int i = startIndex;
+    int i = start;
     //index of crib
     int j = 0;
     //index of keyMap
     int k = 0;
     keymap map[27];
     //loop through each char of crib and cipher
-    while (cipher[i] != '\0' && crib[j] != '\0') {
+    while (crib[j] != '\0' && j <= cribEnd && cipher[i] != '\0' && i <= end) {
         //case both are cipher and crib are alpha
         if (isalpha(cipher[i]) && isalpha(crib[j])) {
             bool conflictFound = false;
@@ -134,7 +122,7 @@ bool findPatternMatch(const char cipher[], int startIndex, const char crib[], ke
                     break;
                 }
             }
-            //if new char not in keymap, add entry into keymap
+            //if new char not in keymap and no conflict found, add entry into keymap
             if (!found) {
                 map[k].cipher = toupper(cipher[i]);
                 map[k].plain = toupper(crib[j]);
@@ -224,17 +212,12 @@ int getNextWord(const char cString[], int index) {
 
 bool decrypt(const char ciphertext[], const char crib[]) {
     //check if crib is longer than max message size
-    if (strlen(crib) > strlen(ciphertext))
-        return false;
-    //make modifiable copy of crib
-    char cribCpy[6371];
-    //copy and sanitize crib
-    strcpy(cribCpy, crib);
-    //check if crib is longer than max message size
-    if ((strlen(cribCpy) > 90) || strlen(cribCpy) > strlen(ciphertext))
-        return false;
-    //false if sanitized crib greater than length 90
-    if (!sanitizeCrib(cribCpy))
+    int cribChar = 0;
+    for (int i = 0; crib[i] != '\0'; i++) {
+        if (isalpha(crib[i]))
+            cribChar++;
+    }
+    if (cribChar > 90)
         return false;
     //set variable to check if match was found
     bool matchFound = false;
@@ -248,8 +231,8 @@ bool decrypt(const char ciphertext[], const char crib[]) {
         //loop until currentIndex reaches lineEnd
         while (currentIndex < lineEnd) {
             //check if word lengths match, then check if letter patterns also match
-            if (findLengthMatch(ciphertext, currentIndex, lineEnd, cribCpy, matchIndex)) {
-                if (findPatternMatch(ciphertext,matchIndex,crib,keyMap)) {
+            if (findLengthMatch(ciphertext, currentIndex, lineEnd, crib, matchIndex)) {
+                if (findPatternMatch(ciphertext,matchIndex,lineEnd,crib,keyMap)) {
                     matchFound = true;
                     break;
                 } else {
@@ -270,14 +253,15 @@ bool decrypt(const char ciphertext[], const char crib[]) {
         //loop until currentIndex reaches lineEnd
         while (currentIndex < lineEnd) {
             //check if word lengths match, then check if letter patterns also match
-            if (findLengthMatch(ciphertext, currentIndex, lineEnd, cribCpy, matchIndex)) {
-                if (findPatternMatch(ciphertext,matchIndex,crib,keyMap)) {
+            if (findLengthMatch(ciphertext, currentIndex, lineEnd, crib, matchIndex)) {
+                if (findPatternMatch(ciphertext,matchIndex,lineEnd,crib,keyMap)) {
                     matchFound = true;
                     break;
-                } else
+                } else {
                     //if length match but pattern doesn't, move on currentIndex to start of next word
                     //and check again
                     currentIndex = getNextWord(ciphertext, currentIndex);
+                }
             } else {
                 //if no length match then move to next line
                 break;
@@ -316,7 +300,7 @@ int main() {
     assert(!decrypt("Rzy pkr", "123431")); //no words in crib
     assert(!decrypt("Rzy pkr", "")); //empty crib
     assert(!decrypt("Rzy pkr", "    \n\n")); //empty crib
-    assert(decrypt("Rzy pkr", "dog")); //multiple matches in a message
+    assert(decrypt("Rzy pkr", "dog")); //multiple matches in a message 
     assert(decrypt("cdc ef", "aba")); //crib matches entire ciphertext word
     assert(!decrypt("cdcef", "aba")); //crib doesn't match if not entire ciphertext word
     assert(!decrypt("efcdc", "aba")); //crib doesn't match if not entire ciphertext word
@@ -332,4 +316,7 @@ int main() {
     assert(decrypt("\n\n     ew'q p-aj", "he")); //empty messages in ciphertext at beginning lines
     assert(decrypt("ew'q\n\n 123213'''''  \n p-aj", "he")); //message with no words in ciphertext
     assert(decrypt("ew'q\n\n 123213'''''  \n p-aj\n\n\n '12321", "he")); //last message in ciphertext no words
+    assert(decrypt("kvbz pqzzyfq bz zqxjqk", "secret")); //match at end of ciphertext
+    assert(decrypt("kvbz pqzzyf bz zqxjqk", "secret")); //multiple length matches in message
+    assert(decrypt("kvbz padgas bz zqxjqk", "secret")); //multiple pattern matches in message
 }

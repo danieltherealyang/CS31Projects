@@ -3,16 +3,102 @@ ID: 205772799
 (Obstacles)
 Some obstacles that I overcame was trying to figure out how to structure and segment my program.
 I was confused at first because I didn't know where to start with the problem however I began
-breaking down the program into various sections such as sanitizing crib input or checking length
-pattern matches with the crib. As I thought about the compartmentalized tasks that needed to be
+breaking down the program into various sections such as finding line or word end indexes or checking
+length pattern matches with the crib. As I thought about the compartmentalized tasks that needed to be
 accomplished to decrypt the ciphertext, writing the program became easier. Another obstacle that
 I had to overcome was debugging. Since I had to write a lot of loops and had to keep track of many
 iterating variables in many of the functions, problems such as out of bounds errors and incorrect
 values being written to arrays occurred and a lot of the time the problem wasn't readily apparent
-which required me to debug each function one by one to isolate the problems.
+which required me to debug each function one by one to isolate the problems. One feature that I
+found cumbersome to implement was having the function iterate through crib without assuming a limit
+since that meant writing a lot of while loops and if statements which makes it difficult to account 
+every possible case.
 
 (Design)
+decrypt:
+The basic design of my program was for the decrypt function to loop through every line of the cipher
+and check if there is a length match and if yes, follow with a pattern match check. If the pattern
+match returns true, then stop looping and set the key value pairs to replace the cipher with. If the
+pattern match fails, run a length match starting from the next word to catch multiple length matches
+in one cipher message.
 
+    (Pseudocode)
+if crib match impossible:
+    return false
+loop repeatedly for each line:
+    while current index < end of line:
+        if (length match found)
+            if (pattern match found)
+                end loop
+            else
+                continue with index starting from next word
+if match found
+    set key value pairs
+otherwise
+    return false
+for each character in cipher:
+    if in key value pairs
+        replace cipher char with plaintext char
+    else
+        output cipher char
+return true
+
+findLengthMatch:
+I used this function to find if a section of the cipher message matched the crib word lengths.
+The function works by looping through each of the cipher and crib characters and checking if
+they are alpha. Nonalpha characters are treated as blanks and skipped over. If the crib and cipher
+doesn't match at some point, the cipher index skips to the beginning of the next word and the crib
+index resets to the beginning of the first word.
+
+    (Pseudocode)
+for each character in cipher:
+    if both cipher char and corresponding crib char is or is not alpha
+        move to next character
+    otherwise
+        if cipher and corresponding crib not a match or reached end of crib before end of cipher word
+            start checking crib from beginning again starting from next word in cipher
+if crib reached end and cipher reached end of word
+    return true, send back index to start of length match
+otherwise
+    return false
+
+findPatternMatch:
+This function takes in a start and end index and checks if there is a pattern match with the crib
+between those indicies. The function works by generating a key value array and checking for conflicts
+as it is looping through the cipher to make sure that the key value pairs are 1 to 1 so a cipher
+cannot be assigned to multiple plaintext values and vice versa.
+
+    (Pseudocode)
+for each character in cipher between start and end indicies:
+    loop through key value array and check for conflicts
+    if conflict found
+        return false
+    if cipher key is already in key value array
+        move to next char in cipher
+    otherwise
+        add cipher char and crib char to the key value array
+return true
+
+getLineEnd:
+This function works with a simple loop to increment the received index until a newline or null char
+is reached in the cipher. After the newline or null char is reached, the function returns the index
+right before it to indicate the last usable char of the line.
+
+setKeyMap:
+The function assumes that a length and pattern match check passed for the index sent to the function.
+The function loops through the alpha chars of cipher and crib with crib starting from the beginning
+and cipher starting from the index sent to the function. For each character in the cipher, the function loops
+through the keymap array, with each element being a custom struct to represent a key value pair for the
+cipher. For each cipher character, the function checks if it is already in the keymap array and if not,
+the key value pair is added to the array.
+
+getNextWord:
+The function loops through a cString starting at the given index. The function loops until the last alpha
+char of the current word, incrementing the index and checking if the current char is an alpha character
+for each iteration of the loop. It then loops through the blanks after the word, looping while the current
+character is not an alpha character. Next, the function checks if the string index it ended up on is a
+newline or terminating character and if so, it returns the index just before otherwise the function returns
+the index it ended up on, which would be the index of the beginning of the next word.
 
 (Test Data)
 assert(decrypt("Xbg'j rsj jds jsrrsy jycn jds ucrsgj qrqyt.\nZU 31 cu zdqrrsgecge!", "silent alarm")); //check multiline ciphertext
@@ -22,12 +108,12 @@ assert(decrypt("F lgr rntoy rkwndyk ahna'y fyadys\n phklk ahk mgtks fyadys.", "s
 assert(!decrypt("Rzy pkr", "123431")); //no words in crib
 assert(!decrypt("Rzy pkr", "")); //empty crib
 assert(!decrypt("Rzy pkr", "    \n\n")); //empty crib
-assert(decrypt("Rzy pkr", "dog")); //multiple matches in a message
+assert(decrypt("Rzy pkr", "dog")); //multiple matches in a message 
 assert(decrypt("cdc ef", "aba")); //crib matches entire ciphertext word
 assert(!decrypt("cdcef", "aba")); //crib doesn't match if not entire ciphertext word
 assert(!decrypt("efcdc", "aba")); //crib doesn't match if not entire ciphertext word
 assert(!decrypt("bwra wmwt\nqeirtk spst\n", "alan turing")); //crib doesn't span multiple messages
-assert(!decrypt("ew'q p-aj", "dog")); //word is only a sequence of letters
+assert(!decrypt("ew'q p-aj", "dog")); //only match consecutive sequence of letters
 assert(decrypt("ew'q p-aj", "he")); //nonalpha char treated as blanks
 assert(decrypt("Kpio't dmpbl-boe-ebhhfs opwfm", "s cloak and")); //nonalpha char treated as blanks
 assert(decrypt("F gspt fe! zyxZYXzyx--Abca abCa    bdefg## $$dsptrqtj6437 wvuWVUwvu\n\n8 9\n", "hush-hush until November 25, 2021")); //crib ignores numbers
@@ -38,3 +124,6 @@ assert(!decrypt("1232341$@##4%!$  \n 1232132\n\n ", "a")); //no words in ciphert
 assert(decrypt("\n\n     ew'q p-aj", "he")); //empty messages in ciphertext at beginning lines
 assert(decrypt("ew'q\n\n 123213'''''  \n p-aj", "he")); //message with no words in ciphertext
 assert(decrypt("ew'q\n\n 123213'''''  \n p-aj\n\n\n '12321", "he")); //last message in ciphertext no words
+assert(decrypt("kvbz pqzzyfq bz zqxjqk", "secret")); //match at end of ciphertext
+assert(decrypt("kvbz pqzzyf bz zqxjqk", "secret")); //multiple length matches in message
+assert(decrypt("kvbz padgas bz zqxjqk", "secret")); //multiple pattern matches in message
